@@ -82,7 +82,7 @@ app.get('/api/keys', (req, res) => {
 });
 
 // Fallback ke index.html
-app.get('*', (req, res) => {
+app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
