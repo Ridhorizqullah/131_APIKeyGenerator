@@ -24,7 +24,8 @@ const connectDB = async () => {
       host: 'localhost',
       user: 'root',           // ← sesuaikan
       password: 'ridhorzq',        // ← sesuaikan
-      database: 'apikey_db'   // ← sesuaikan (harus sudah dibuat)
+      database: 'apikey_db',
+      port: '3309',   // ← sesuaikan (harus sudah dibuat)
     });
     console.log('✅ Terhubung ke database MySQL');
     return db;
