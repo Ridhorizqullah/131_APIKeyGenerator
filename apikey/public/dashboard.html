@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head><title>Dashboard</title></head>
+<body>
+  <h2>Daftar User & API Key</h2>
+  <table border="1" id="userTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nama Depan</th>
+        <th>Nama Belakang</th>
+        <th>Email</th>
+        <th>API Key</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <br>
+  <a href="user-register.html">Buat User Baru</a>
+
+  <script>
+    async function loadDashboard() {
+      const res = await fetch('/dashboard');
+      const users = await res.json();
+      const tbody = document.querySelector('#userTable tbody');
+      tbody.innerHTML = '';
+
+      users.forEach(user => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${user['ID User']}</td>
+          <td>${user['Nama Depan']}</td>
+          <td>${user['Nama Belakang']}</td>
+          <td>${user['Email']}</td>
+          <td><code>${user['API Key']}</code></td>
+          <td>${user['Status Key']}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>

@@ -10,6 +10,7 @@
     <button type="submit">Generate API Key</button>
   </form>
   <div id="result"></div>
+  <br>
   <a href="dashboard.html">Lihat Dashboard</a>
 
   <script>
@@ -28,8 +29,8 @@
 
       if (data.success) {
         document.getElementById('result').innerHTML = `
-          <h3>✅ Berhasil!</h3>
-          <p><strong>API Key Anda:</strong> ${data.apiKey}</p>
+          <h3>✅ Sukses!</h3>
+          <p><strong>API Key:</strong> <code>${data.apiKey}</code></p>
         `;
       } else {
         alert(data.error);
