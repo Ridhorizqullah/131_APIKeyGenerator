@@ -1,14 +1,114 @@
 <!DOCTYPE html>
-<html>
-<head><title>Login Admin</title></head>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login Admin</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .login-container {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .login-container h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #2575fc;
+      box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.2);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: #2575fc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background: #1a64d6;
+    }
+
+    .link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #2575fc;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
 <body>
-  <h2>Login Admin</h2>
-  <form onsubmit="login(event)">
-    <input type="email" id="email" placeholder="Email" required><br><br>
-    <input type="password" id="password" placeholder="Password" required><br><br>
-    <button type="submit">Login</button>
-  </form>
-  <a href="register.html">Belum punya akun? Daftar</a>
+  <div class="login-container">
+    <h2>🔑 Login Admin</h2>
+    <form onsubmit="login(event)">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="Masukkan email Anda" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Masukkan password" required />
+      </div>
+      <button type="submit" class="btn">Login</button>
+    </form>
+    <a href="register.html" class="link">Belum punya akun? Daftar</a>
+  </div>
 
   <script>
     async function login(e) {
@@ -16,18 +116,23 @@
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
 
-      const res = await fetch('/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
+      try {
+        const res = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
 
-      if (data.success) {
-        alert('Login berhasil!');
-        window.location.href = 'dashboard.html';
-      } else {
-        alert(data.message);
+        if (data.success) {
+          alert('✅ Login berhasil!');
+          window.location.href = 'dashboard.html';
+        } else {
+          alert('❌ ' + data.message);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('⚠️ Terjadi kesalahan saat login. Coba lagi.');
       }
     }
   </script>

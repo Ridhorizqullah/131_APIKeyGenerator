@@ -1,41 +1,456 @@
 <!DOCTYPE html>
-<html>
-<head><title>Buat User & API Key</title></head>
-<body>
-  <h2>Buat User Baru</h2>
-  <form onsubmit="createUser(event)">
-    <input type="text" id="first_name" placeholder="Nama Depan" required><br><br>
-    <input type="text" id="last_name" placeholder="Nama Belakang" required><br><br>
-    <input type="email" id="email" placeholder="Email" required><br><br>
-    <button type="submit">Generate API Key</button>
-  </form>
-  <div id="result"></div>
-  <br>
-  <a href="dashboard.html">Lihat Dashboard</a>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daftar User & API Key</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+    }
 
-  <script>
-    async function createUser(e) {
-      e.preventDefault();
-      const first_name = document.getElementById('first_name').value;
-      const last_name = document.getElementById('last_name').value;
-      const email = document.getElementById('email').value;
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-      const res = await fetch('/user-register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ first_name, last_name, email })
-      });
-      const data = await res.json();
+    .container {
+      max-width: 600px;
+      width: 100%;
+    }
 
-      if (data.success) {
-        document.getElementById('result').innerHTML = `
-          <h3>✅ Sukses!</h3>
-          <p><strong>API Key:</strong> <code>${data.apiKey}</code></p>
-        `;
-      } else {
-        alert(data.error);
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 45px;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .icon-wrapper {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 20px;
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+    }
+
+    h1 {
+      color: #2c3e50;
+      font-size: 1.8em;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #888;
+      font-size: 0.95em;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #2c3e50;
+      font-size: 0.9em;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      opacity: 0.5;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 14px 14px 14px 45px;
+      border: 2px solid #e8eaf6;
+      border-radius: 12px;
+      font-size: 15px;
+      transition: all 0.3s;
+      background: white;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-group input::placeholder {
+      color: #bbb;
+    }
+
+    .api-key-group {
+      position: relative;
+    }
+
+    .api-key-input {
+      font-family: 'Consolas', monospace !important;
+      background: #f8f9fc !important;
+      color: #667eea !important;
+      font-size: 13px !important;
+      letter-spacing: 0.5px;
+    }
+
+    .copy-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85em;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .copy-btn:hover {
+      transform: translateY(-50%) scale(1.05);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .btn {
+      padding: 14px 20px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+      font-size: 0.95em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-generate {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-generate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-generate:active {
+      transform: translateY(0);
+    }
+
+    .btn-save {
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      color: white;
+      box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+    }
+
+    .btn-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+    }
+
+    .btn-save:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .alert {
+      padding: 14px 18px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9em;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
     }
+
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .back-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 25px;
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 12px;
+      border-radius: 12px;
+      transition: all 0.3s;
+    }
+
+    .back-link:hover {
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .info-box {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .info-box p {
+      color: #667eea;
+      font-size: 0.85em;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top: 3px solid white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 600px) {
+      .card {
+        padding: 30px 25px;
+      }
+      
+      .buttons {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 1.5em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <div class="icon-wrapper">🔑</div>
+        <h1>Daftar User Baru</h1>
+        <p class="subtitle">Lengkapi form untuk membuat user dan API key</p>
+      </div>
+
+      <div id="alertBox" class="alert"></div>
+
+      <div class="info-box">
+        <p>💡 <strong>Tips:</strong> Generate API Key terlebih dahulu sebelum menyimpan data user</p>
+      </div>
+
+      <form id="userForm">
+        <div class="form-group">
+          <label for="first_name">Nama Depan</label>
+          <div class="input-wrapper">
+            <span class="input-icon">👤</span>
+            <input type="text" id="first_name" placeholder="Masukkan nama depan" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="last_name">Nama Belakang</label>
+          <div class="input-wrapper">
+            <span class="input-icon">👤</span>
+            <input type="text" id="last_name" placeholder="Masukkan nama belakang" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <div class="input-wrapper">
+            <span class="input-icon">📧</span>
+            <input type="email" id="email" placeholder="nama@email.com" required />
+          </div>
+        </div>
+
+        <div class="form-group api-key-group">
+          <label for="api_key">API Key</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🔐</span>
+            <input type="text" id="api_key" class="api-key-input" readonly placeholder="Generate key terlebih dahulu" />
+            <button type="button" id="copyBtn" class="copy-btn" style="display: none;">📋 Copy</button>
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button type="button" id="generateKeyBtn" class="btn btn-generate">
+            <span>🔄</span>
+            <span>Generate Key</span>
+          </button>
+          <button type="submit" id="saveUserBtn" class="btn btn-save">
+            <span>💾</span>
+            <span>Simpan User</span>
+          </button>
+        </div>
+      </form>
+
+      <a href="dashboard.html" class="back-link">
+        <span>←</span>
+        <span>Kembali ke Dashboard</span>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    let currentApiKey = '';
+
+    function showAlert(message, type = 'success') {
+      const alertBox = document.getElementById('alertBox');
+      alertBox.className = `alert alert-${type}`;
+      alertBox.textContent = message;
+      alertBox.style.display = 'flex';
+      
+      setTimeout(() => {
+        alertBox.style.display = 'none';
+      }, 5000);
+    }
+
+    document.getElementById('generateKeyBtn').addEventListener('click', () => {
+      const chars = '0123456789abcdef';
+      let key = '';
+      for (let i = 0; i < 64; i++) {
+        key += chars[Math.floor(Math.random() * chars.length)];
+      }
+      currentApiKey = key;
+      document.getElementById('api_key').value = key;
+      document.getElementById('copyBtn').style.display = 'block';
+      
+      showAlert('✅ API Key berhasil di-generate!', 'info');
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      const apiKeyInput = document.getElementById('api_key');
+      try {
+        await navigator.clipboard.writeText(apiKeyInput.value);
+        showAlert('✅ API Key berhasil disalin!', 'info');
+      } catch (err) {
+        apiKeyInput.select();
+        document.execCommand('copy');
+        showAlert('✅ API Key berhasil disalin!', 'info');
+      }
+    });
+
+    document.getElementById('userForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const first = document.getElementById('first_name').value.trim();
+      const last = document.getElementById('last_name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const saveBtn = document.getElementById('saveUserBtn');
+
+      if (!first || !last || !email) {
+        showAlert('⚠️ Semua kolom wajib diisi.', 'info');
+        return;
+      }
+
+      if (!currentApiKey) {
+        showAlert('⚠️ Silakan generate API Key terlebih dahulu.', 'info');
+        return;
+      }
+
+      // Disable button and show loading
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<div class="spinner"></div><span>Menyimpan...</span>';
+
+      try {
+        const res = await fetch('/user-register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ first_name: first, last_name: last, email })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          showAlert('✅ User dan API Key berhasil dibuat! Mengarahkan ke dashboard...', 'success');
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 1500);
+        } else {
+          showAlert('❌ ' + (data.error || 'Gagal menyimpan data.'), 'info');
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = '<span>💾</span><span>Simpan User</span>';
+        }
+      } catch (err) {
+        showAlert('⚠️ Terjadi kesalahan jaringan.', 'info');
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<span>💾</span><span>Simpan User</span>';
+      }
+    });
   </script>
 </body>
 </html>

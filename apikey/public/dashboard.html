@@ -1,43 +1,522 @@
 <!DOCTYPE html>
-<html>
-<head><title>Dashboard</title></head>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard Admin</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Header Styles */
+    header {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 25px 30px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      color: white;
+      font-size: 2em;
+      font-weight: 700;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .subtitle {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9em;
+      margin-top: 5px;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+
+    .stat-card:nth-child(1) .stat-icon {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+
+    .stat-card:nth-child(2) .stat-icon {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+    }
+
+    .stat-card:nth-child(3) .stat-icon {
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+    }
+
+    .stat-label {
+      color: #888;
+      font-size: 0.85em;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      color: #2c3e50;
+      font-size: 2em;
+      font-weight: 700;
+    }
+
+    /* Button Styles */
+    .btn {
+      padding: 12px 28px;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+      transition: all 0.3s;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95em;
+    }
+
+    .btn-primary {
+      background: white;
+      color: #667eea;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Table Card */
+    .table-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .table-header {
+      padding: 25px 30px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-title {
+      font-size: 1.3em;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: #f8f9fc;
+    }
+
+    th {
+      padding: 18px 20px;
+      text-align: left;
+      font-weight: 600;
+      color: #667eea;
+      font-size: 0.85em;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #e8eaf6;
+    }
+
+    td {
+      padding: 18px 20px;
+      border-bottom: 1px solid #f0f0f0;
+      color: #2c3e50;
+    }
+
+    tbody tr {
+      transition: background 0.2s;
+    }
+
+    tbody tr:hover {
+      background: #f8f9fc;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9em;
+    }
+
+    .user-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-name {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .user-email {
+      font-size: 0.85em;
+      color: #888;
+    }
+
+    code {
+      background: linear-gradient(135deg, #667eea15, #764ba215);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-family: 'Consolas', monospace;
+      font-size: 0.85em;
+      color: #667eea;
+      border: 1px solid #667eea30;
+      display: inline-block;
+    }
+
+    .status-badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8em;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .status-active {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-inactive {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .delete-btn {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      font-size: 0.85em;
+    }
+
+    .delete-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 40px;
+      color: #888;
+    }
+
+    .empty-icon {
+      font-size: 4em;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .empty-state a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .empty-state a:hover {
+      text-decoration: underline;
+    }
+
+    /* Loading Animation */
+    .loading {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body { padding: 10px; }
+      header { padding: 20px; }
+      h1 { font-size: 1.5em; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .table-header { flex-direction: column; gap: 15px; align-items: flex-start; }
+      th, td { padding: 12px 10px; font-size: 0.85em; }
+      .user-info { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
 <body>
-  <h2>Daftar User & API Key</h2>
-  <table border="1" id="userTable">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nama Depan</th>
-        <th>Nama Belakang</th>
-        <th>Email</th>
-        <th>API Key</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  <br>
-  <a href="user-register.html">Buat User Baru</a>
+  <div class="container">
+    <header>
+      <div class="header-left">
+        <div class="logo">📊</div>
+        <div>
+          <h1>Dashboard Admin</h1>
+          <div class="subtitle">Kelola semua pengguna sistem</div>
+        </div>
+      </div>
+      <div>
+        <a href="index.html" class="btn btn-secondary">← Kembali ke Beranda</a>
+      </div>
+    </header>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-label">Total Users</div>
+        <div class="stat-value" id="totalUsers">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-label">Active Keys</div>
+        <div class="stat-value" id="activeKeys">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔑</div>
+        <div class="stat-label">API Keys</div>
+        <div class="stat-value" id="totalKeys">0</div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title">
+          <span>📋</span>
+          <span>Daftar Pengguna</span>
+        </div>
+        
+      </div>
+      <div class="table-wrapper">
+        <table id="userTable">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>API Key</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
   <script>
     async function loadDashboard() {
-      const res = await fetch('/dashboard');
-      const users = await res.json();
       const tbody = document.querySelector('#userTable tbody');
-      tbody.innerHTML = '';
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="loading">
+            <div class="spinner"></div>
+            <div>Memuat data...</div>
+          </td>
+        </tr>
+      `;
 
-      users.forEach(user => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${user['ID User']}</td>
-          <td>${user['Nama Depan']}</td>
-          <td>${user['Nama Belakang']}</td>
-          <td>${user['Email']}</td>
-          <td><code>${user['API Key']}</code></td>
-          <td>${user['Status Key']}</td>
+      try {
+        const res = await fetch('/dashboard');
+        const users = await res.json();
+
+        // Update stats
+        document.getElementById('totalUsers').textContent = users.length;
+        document.getElementById('activeKeys').textContent = users.filter(u => u['Status Key'] === 'aktif').length;
+        document.getElementById('totalKeys').textContent = users.filter(u => u['API Key']).length;
+
+        if (users.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="5" class="empty-state">
+                <div class="empty-icon">📭</div>
+                <div style="font-size:1.2em; margin-bottom:10px; color:#2c3e50;">Belum ada pengguna terdaftar</div>
+                <div>Mulai dengan <a href="user-register.html">membuat user pertama</a></div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = '';
+        users.forEach(user => {
+          const initials = (user['Nama Depan'][0] + (user['Nama Belakang'][0] || '')).toUpperCase();
+          const statusClass = user['Status Key'] === 'aktif' ? 'status-active' : 'status-inactive';
+          
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">${initials}</div>
+                <div class="user-details">
+                  <div class="user-name">${user['Nama Depan']} ${user['Nama Belakang']}</div>
+                  <div class="user-email">#${user['ID User']}</div>
+                </div>
+              </div>
+            </td>
+            <td>${user['Email']}</td>
+            <td><code>${user['API Key'] || 'Belum ada'}</code></td>
+            <td><span class="status-badge ${statusClass}">${user['Status Key']}</span></td>
+            <td>
+              <button class="delete-btn" onclick="deleteUser(${user['ID User']})">🗑️ Hapus</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty-state">
+              <div class="empty-icon">⚠️</div>
+              <div style="color:#f5576c;">Gagal memuat data. Silakan refresh halaman.</div>
+            </td>
+          </tr>
         `;
-        tbody.appendChild(tr);
-      });
+        console.error(err);
+      }
+    }
+
+    async function deleteUser(userId) {
+      if (!confirm('⚠️ Yakin ingin menghapus user ini? Tindakan tidak dapat dibatalkan.')) return;
+
+      try {
+        const res = await fetch(`/delete-user/${userId}`, { method: 'DELETE' });
+        const data = await res.json();
+
+        if (data.success) {
+          alert('✅ User berhasil dihapus!');
+          loadDashboard();
+        } else {
+          alert('❌ ' + (data.error || 'Gagal menghapus user.'));
+        }
+      } catch (err) {
+        alert('⚠️ Terjadi kesalahan saat menghapus.');
+        console.error(err);
+      }
     }
 
     loadDashboard();

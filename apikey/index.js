@@ -19,7 +19,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Koneksi DB
 const getDBConnection = () => {
   return mysql.createConnection({
     host: process.env.DB_HOST || '127.0.0.1',
@@ -30,28 +29,25 @@ const getDBConnection = () => {
   });
 };
 
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 // === 1. REGISTER ADMIN ===
 app.post('/register', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(400).json({ error: 'Email dan password wajib diisi' });
   }
-
   let conn;
   try {
     conn = await getDBConnection();
-    await conn.execute(
-      'INSERT INTO admin (email, password) VALUES (?, ?)',
-      [email, password]
-    );
+    await conn.execute('INSERT INTO admin (email, password) VALUES (?, ?)', [email, password]);
     await conn.end();
     res.json({ message: 'Admin berhasil didaftarkan!' });
   } catch (err) {
     if (conn) await conn.end();
-    if (err.code === 'ER_DUP_ENTRY') {
-      return res.status(400).json({ error: 'Email sudah terdaftar' });
-    }
-    console.error('Register error:', err);
+    if (err.code === 'ER_DUP_ENTRY') return res.status(400).json({ error: 'Email sudah terdaftar' });
+    console.error(err);
     res.status(500).json({ error: 'Gagal mendaftarkan admin' });
   }
 });
@@ -62,16 +58,11 @@ app.post('/login', async (req, res) => {
   if (!email || !password) {
     return res.status(400).json({ error: 'Email dan password wajib diisi' });
   }
-
   let conn;
   try {
     conn = await getDBConnection();
-    const [rows] = await conn.execute(
-      'SELECT * FROM admin WHERE email = ? AND password = ?',
-      [email, password]
-    );
+    const [rows] = await conn.execute('SELECT * FROM admin WHERE email = ? AND password = ?', [email, password]);
     await conn.end();
-
     if (rows.length > 0) {
       res.json({ success: true, message: 'Login berhasil' });
     } else {
@@ -79,7 +70,7 @@ app.post('/login', async (req, res) => {
     }
   } catch (err) {
     if (conn) await conn.end();
-    console.error('Login error:', err);
+    console.error(err);
     res.status(500).json({ error: 'Gagal login' });
   }
 });
@@ -90,37 +81,21 @@ app.post('/user-register', async (req, res) => {
   if (!first_name || !last_name || !email) {
     return res.status(400).json({ error: 'Semua field wajib diisi' });
   }
-
   const apiKey = randomBytes(32).toString('hex');
-
   let conn;
   try {
     conn = await getDBConnection();
-
-    const [keyResult] = await conn.execute(
-      'INSERT INTO api_keys (key_value, out_of_date) VALUES (?, 0)',
-      [apiKey]
-    );
-    const keyId = keyResult.insertId;
-
-    await conn.execute(
-      'INSERT INTO users (first_name, last_name, email, api_key_id) VALUES (?, ?, ?, ?)',
-      [first_name, last_name, email, keyId]
-    );
-
+    const [keyRes] = await conn.execute('INSERT INTO api_keys (key_value, out_of_date) VALUES (?, 0)', [apiKey]);
+    const keyId = keyRes.insertId;
+    await conn.execute('INSERT INTO users (first_name, last_name, email, api_key_id) VALUES (?, ?, ?, ?)', [first_name, last_name, email, keyId]);
     await conn.end();
-
-    res.json({
-      success: true,
-      message: 'User dan API Key berhasil dibuat!',
-      apiKey
-    });
+    res.json({ success: true, message: 'User dan API Key berhasil dibuat!', apiKey });
   } catch (err) {
     if (conn) await conn.end();
     if (err.code === 'ER_DUP_ENTRY' && err.message.includes('email')) {
       return res.status(400).json({ error: 'Email user sudah terdaftar' });
     }
-    console.error('User register error:', err);
+    console.error(err);
     res.status(500).json({ error: 'Gagal membuat user' });
   }
 });
@@ -137,10 +112,7 @@ app.get('/dashboard', async (req, res) => {
         u.last_name AS "Nama Belakang",
         u.email AS "Email",
         k.key_value AS "API Key",
-        CASE 
-          WHEN k.out_of_date = 1 THEN 'Nonaktif'
-          ELSE 'Aktif'
-        END AS "Status Key"
+        CASE WHEN k.out_of_date = 1 THEN 'Nonaktif' ELSE 'Aktif' END AS "Status Key"
       FROM users u
       LEFT JOIN api_keys k ON u.api_key_id = k.id
     `);
@@ -148,18 +120,40 @@ app.get('/dashboard', async (req, res) => {
     res.json(rows);
   } catch (err) {
     if (conn) await conn.end();
-    console.error('Dashboard error:', err);
+    console.error(err);
     res.status(500).json({ error: 'Gagal mengambil data' });
   }
 });
 
-// === Redirect root ke login (TANPA index.html) ===
+// === 5. HAPUS USER ===
+app.delete('/delete-user/:id', async (req, res) => {
+  const userId = req.params.id;
+  if (!userId || isNaN(userId)) {
+    return res.status(400).json({ error: 'ID tidak valid' });
+  }
+  let conn;
+  try {
+    conn = await getDBConnection();
+    const [result] = await conn.execute('DELETE FROM users WHERE id = ?', [userId]);
+    await conn.end();
+    if (result.affectedRows > 0) {
+      res.json({ success: true, message: 'User berhasil dihapus' });
+    } else {
+      res.status(404).json({ error: 'User tidak ditemukan' });
+    }
+  } catch (err) {
+    if (conn) await conn.end();
+    console.error(err);
+    res.status(500).json({ error: 'Gagal menghapus user' });
+  }
+});
+
+// === Redirect root ke login ===
 app.get('/', (req, res) => {
   res.redirect('/login.html');
 });
 
-// Jalankan server
 app.listen(PORT, () => {
   console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
-  console.log(`📁 Database: ${process.env.DB_NAME || 'tidak disetel'}`);
+  console.log(`📁 Database: ${process.env.DB_NAME}`);
 });

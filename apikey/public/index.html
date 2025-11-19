@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sistem Manajemen API Key</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated Background */
+    body::before {
+      content: '';
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.2) 0%, transparent 50%);
+      animation: float 15s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-30px, -30px); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 520px;
+      width: 100%;
+      padding: 50px 40px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .logo {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 25px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 45px;
+      box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    h1 {
+      font-size: 2.3em;
+      margin-bottom: 12px;
+      color: #2c3e50;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      margin-bottom: 40px;
+      color: #888;
+      font-size: 1.05em;
+      font-weight: 500;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 16px 24px;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.05em;
+      font-weight: 600;
+      text-decoration: none;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-icon {
+      font-size: 1.3em;
+    }
+
+    .btn-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .btn-title {
+      font-size: 1em;
+      font-weight: 600;
+    }
+
+    .btn-desc {
+      font-size: 0.8em;
+      opacity: 0.9;
+      font-weight: 400;
+    }
+
+    .btn-login {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+
+    .btn-register {
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .btn:active {
+      transform: translateY(-1px);
+    }
+
+    .info-box {
+      margin-top: 30px;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      border-radius: 16px;
+      text-align: left;
+    }
+
+    .info-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #667eea;
+      font-weight: 600;
+      margin-bottom: 12px;
+      font-size: 0.95em;
+    }
+
+    .info-content {
+      color: #555;
+      font-size: 0.9em;
+      line-height: 1.7;
+    }
+
+    .info-content strong {
+      color: #2c3e50;
+    }
+
+    .highlight {
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .divider {
+      margin: 25px 0;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #ddd, transparent);
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .feature {
+      padding: 15px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+    }
+
+    .feature:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .feature-icon {
+      font-size: 1.8em;
+      margin-bottom: 8px;
+    }
+
+    .feature-text {
+      font-size: 0.8em;
+      color: #555;
+      font-weight: 500;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 40px 30px;
+      }
+
+      h1 {
+        font-size: 1.9em;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+      }
+
+      .btn-text {
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">🔑</div>
+    <h1>Sistem API Key</h1>
+    <p class="subtitle">Panel Manajemen Internal</p>
+
+    <div class="buttons">
+      <a href="login.html" class="btn btn-login">
+        <div class="btn-content">
+          <span class="btn-icon">🔐</span>
+          <div class="btn-text">
+            <span class="btn-title">Login Admin</span>
+            <span class="btn-desc">Akses dashboard manajemen</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="user-register.html" class="btn btn-register">
+        <div class="btn-content">
+          <span class="btn-icon">📝</span>
+          <div class="btn-text">
+            <span class="btn-title">Daftar User Baru</span>
+            <span class="btn-desc">Buat akun dan dapatkan API key</span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-text">Cepat & Mudah</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-text">Aman Terjamin</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📊</div>
+        <div class="feature-text">Kelola Data</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <div class="info-title">
+        <span>ℹ️</span>
+        <span>Informasi Penting</span>
+      </div>
+      <div class="info-content">
+        Hanya <strong>admin</strong> yang dapat login ke sistem. User biasa <span class="highlight">tidak memiliki akses login</span> — mereka hanya menerima API Key yang dibuat oleh admin untuk menggunakan layanan.
+      </div>
+    </div>
+  </div>
+</body>
+</html>
