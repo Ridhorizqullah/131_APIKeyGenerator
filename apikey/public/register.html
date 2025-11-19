@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head><title>Register Admin</title></head>
+<body>
+  <h2>Register Admin</h2>
+  <form onsubmit="register(event)">
+    <input type="email" id="email" placeholder="Email" required><br><br>
+    <input type="password" id="password" placeholder="Password" required><br><br>
+    <button type="submit">Register</button>
+  </form>
+  <a href="index.html">Kembali</a>
+
+  <script>
+    async function register(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const res = await fetch('/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      alert(data.message || data.error);
+    }
+  </script>
+</body>
+</html>
